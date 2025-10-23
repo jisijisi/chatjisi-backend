@@ -4,27 +4,29 @@ import fetch from "node-fetch";
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import cors from "cors"; // ✅ Enable CORS
 
-// 🧠 Load environment variables
+// Load environment variables
+dotenv.config();
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-dotenv.config({ path: path.join(__dirname, ".env") });
 
-// 🧩 Initialize Express
 const app = express();
 const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// ✅ Middleware
+// Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../frontend"))); // serve frontend files if needed
+app.use(cors()); // ✅ Allow requests from any origin
+app.use(express.static(path.join(__dirname, "../frontend"))); // optional, serve frontend files if needed
 
-// 🧠 Health check / homepage route
+// Root route (health check)
 app.get("/", (req, res) => {
   res.send("✅ ChatJisi backend is running successfully!");
 });
 
-// 💬 Handle chat requests
+// POST /ask route for chat
 app.post("/ask", async (req, res) => {
   const { prompt } = req.body;
 
@@ -69,7 +71,7 @@ app.post("/ask", async (req, res) => {
   }
 });
 
-// 🚀 Start server
+// Start server
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
   console.log(`🌐 Visit http://localhost:${PORT}`);
